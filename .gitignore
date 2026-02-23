@@ -39,3 +39,6 @@ fp-info-cache
 
 # lck files
 *.lck
+
+# backup zips
+*.zip
