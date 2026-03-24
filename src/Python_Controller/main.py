@@ -52,6 +52,7 @@ def theme_toggle_hitbox():
 
 
 #Image Upload
+"""
 def load_texture(path):
     if not os.path.exists(path):
         raise FileNotFoundError(f"Image not found: {path}")
@@ -62,7 +63,7 @@ def load_texture(path):
 
     width, height, channels, data = image_data
     return dpg.add_static_texture(width, height, data)
-
+"""
 # Main function
 def main():
     dpg.create_context()
@@ -75,10 +76,12 @@ def main():
         # Better to use an English-only path if possible
         image_path = "D:/image.png"
         my_texture = load_texture(image_path)
-
+    
     with dpg.window(tag="main_window"):
         dpg.add_text("Solar Gamera", tag="title_text", pos=(30, 20))
+        """
         dpg.add_image(my_texture, pos=(80, 50), width=400, height=400)
+        """
 
 
         # Emergency Stop Button
