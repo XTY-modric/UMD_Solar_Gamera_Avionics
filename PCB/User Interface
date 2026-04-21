@@ -1,1 +1,571 @@
 
+import dearpygui.dearpygui as dpg
+import os
+
+# Front
+def create_fonts():
+    with dpg.font_registry():
+        fonts = {
+            "title": dpg.add_font("/System/Library/Fonts/Supplemental/Arial.ttf", 30),
+            "small": dpg.add_font("/System/Library/Fonts/Supplemental/Arial.ttf", 18),
+            "medium": dpg.add_font("/System/Library/Fonts/Supplemental/Arial.ttf", 23),
+            "large": dpg.add_font("/System/Library/Fonts/Supplemental/Arial.ttf", 40),
+        }
+    return fonts
+
+
+def apply_font(item_tag, font):
+    dpg.bind_item_font(item_tag, font)
+
+
+# Window theme
+def theme_main_window():
+    with dpg.theme() as window_theme:
+        with dpg.theme_component(dpg.mvWindowAppItem):
+            dpg.add_theme_color(dpg.mvThemeCol_WindowBg, (255, 255, 255, 255))
+        with dpg.theme_component(dpg.mvText):
+            dpg.add_theme_color(dpg.mvThemeCol_Text, (0, 0, 0, 255))
+    dpg.bind_item_theme("main_window", window_theme)
+
+
+# Button Color, Size
+def theme_stop_button():
+    with dpg.theme() as button_theme:
+        with dpg.theme_component(dpg.mvButton):
+            dpg.add_theme_color(dpg.mvThemeCol_Button, (242, 165, 48, 255))
+            dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, (230, 175, 175, 255))
+            dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, (220, 160, 160, 255))
+            dpg.add_theme_color(dpg.mvThemeCol_Text, (0, 0, 0, 255))
+    dpg.bind_item_theme("stop_button", button_theme)
+
+def theme_toggle_hitbox():
+    with dpg.theme() as invisible_theme:
+        with dpg.theme_component(dpg.mvButton):
+            dpg.add_theme_color(dpg.mvThemeCol_Button, (0, 0, 0, 0))
+            dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, (0, 0, 0, 0))
+            dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, (0, 0, 0, 0))
+            dpg.add_theme_color(dpg.mvThemeCol_Border, (0, 0, 0, 0))
+
+    dpg.bind_item_theme("toggle_hitbox1", invisible_theme)
+    dpg.bind_item_theme("toggle_hitbox2", invisible_theme)
+    dpg.bind_item_theme("toggle_hitbox3", invisible_theme)
+    dpg.bind_item_theme("toggle_hitbox4", invisible_theme)
+
+
+#Image Upload
+"""
+def load_texture(path):
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"Image not found: {path}")
+
+    image_data = dpg.load_image(path)
+    if image_data is None:
+        raise ValueError(f"Dear PyGui failed to load image: {path}")
+
+    width, height, channels, data = image_data
+    return dpg.add_static_texture(width, height, data)
+"""
+# Main function
+def main():
+    dpg.create_context()
+    dpg.create_viewport(title="Solar Gamera", width=1500, height=1000)
+    dpg.setup_dearpygui()
+
+    fonts = create_fonts()
+
+    with dpg.texture_registry():
+        # Better to use an English-only path if possible
+        image_path = "D:/image.png" # change the image storage path
+
+    with dpg.window(tag="main_window"):
+        dpg.add_text("Solar Gamera", tag="title_text", pos=(30, 20))
+        """
+        with dpg.texture_registry():
+            image_path = "/Users/yxt/Desktop/image.png"  # change to your Mac path
+    
+        if os.path.exists(image_path):
+            my_texture = load_texture(image_path)
+        else:
+            print(f"Warning: Image not found → {image_path}")
+            my_texture = None
+        """
+
+        with dpg.plot(label="PPM and Throttle% vs time (N)", height=300, width=360, pos=(650, 330)):
+            dpg.add_plot_legend()
+            dpg.add_plot_axis(dpg.mvXAxis, label="Time")
+            y_axis_n = dpg.add_plot_axis(dpg.mvYAxis, label="RPM")
+            dpg.add_line_series([], [], parent=y_axis_n, tag="rpm_series_n", label="Live Data")
+        
+        with dpg.plot(label="PPM and Throttle% vs time (S)", height=300, width=360, pos=(1070, 330)):
+            dpg.add_plot_legend()
+            dpg.add_plot_axis(dpg.mvXAxis, label="Time")
+            y_axis_s = dpg.add_plot_axis(dpg.mvYAxis, label="RPM")
+            dpg.add_line_series([], [], parent=y_axis_s, tag="rpm_series_s", label="Live Data")
+        """
+        with dpg.plot(label="PPM and Throttle% vs time (E)", height=300, width=350, pos=(650, 650)):
+            dpg.add_plot_legend()
+            dpg.add_plot_axis(dpg.mvXAxis, label="PWM")
+            y_axis_e = dpg.add_plot_axis(dpg.mvYAxis, label="RPM")
+            dpg.add_line_series([], [], parent=y_axis_e, tag="rpm_series_e", label="Live Data")
+
+        with dpg.plot(label="PPM and Throttle% vs time (W)", height=300, width=350, pos=(1020, 650)):
+            dpg.add_plot_legend()
+            dpg.add_plot_axis(dpg.mvXAxis, label="PWM")
+            y_axis_w = dpg.add_plot_axis(dpg.mvYAxis, label="RPM")
+            dpg.add_line_series([], [], parent=y_axis_w, tag="rpm_series_w", label="Live Data")
+
+
+        dpg.set_value("rpm_series_n", [ ])
+        dpg.set_value("rpm_series_s", [ ])
+        dpg.set_value("rpm_series_e", [ ])
+        dpg.set_value("rpm_series_w", [ ])
+        """
+        #dpg.add_button(label="Add Data", callback=add_point, pos=(650, 870))
+
+        # Emergency Stop Button
+        dpg.add_button(label="EMERGENCY STOP",
+            tag="stop_button",
+            callback=Emerstop,
+            width=620,
+            height=80,
+            pos=(650, 240)
+        )
+
+        # E-STOP Reset
+        dpg.add_button(label="E-STOP Reset",
+            tag="e_stop_button",
+            callback=estop,
+            width=160,
+            height=80,
+            pos=(1270, 240),
+        )
+
+        dpg.draw_rectangle(
+            (80, 420),
+            (350, 450),
+            color=(0, 0, 0, 255),
+            fill=(255, 255, 255, 255),  # white
+            parent="value_layer"
+        )
+
+        # Toggle Button 1
+        dpg.add_button(
+            label="",
+            tag="toggle_hitbox1",
+            width=150,
+            height=300,
+            pos=(650, 40),
+            callback=toggle1
+        )
+
+        # Toggle Button 2
+        dpg.add_button(
+            label="",
+            tag="toggle_hitbox2",
+            width=150,
+            height=300,
+            pos=(850, 40),
+            callback=toggle2
+        )
+
+        # Toggle Button 3
+        dpg.add_button(
+            label="",
+            tag="toggle_hitbox3",
+            width=150,
+            height=300,
+            pos=(1050, 40),
+            callback=toggle3
+        )
+
+        # Toggle Button 4
+        dpg.add_button(
+            label="",
+            tag="toggle_hitbox4",
+            width=150,
+            height=300,
+            pos=(1250, 40),
+            callback=toggle4
+        )
+
+        # Percentage and RPM 1
+        dpg.draw_rectangle(
+            (642, 180),
+            (700, 220),
+            color=(0, 0, 0, 255),
+            fill=(255, 255, 255, 255),  # white
+            parent="value_layer"
+        )
+
+        dpg.draw_rectangle(
+            (710, 180),
+            (793, 220),
+            color=(0, 0, 0, 255),
+            fill=(255, 255, 255, 255),  # white
+            parent="value_layer"
+        )
+
+        perc1 = angvel1()[0]
+
+        dpg.draw_text(
+            (647, 188),
+            perc1,
+            tag="rpm_text",
+            size=20,
+            color=(0, 0, 0, 255),
+            parent="value_layer"
+        )
+
+        rpm1 = angvel1()[1]
+
+        dpg.draw_text(
+            (718, 188),
+            rpm1,
+            tag="rpm_text1",
+            size=20,
+            color=(0, 0, 0, 255),
+            parent="value_layer"
+        )
+
+        dpg.draw_rectangle(
+            (642, 140),
+            (793, 170),
+            color=(0, 0, 0, 255),
+            fill=(255, 255, 255, 255),  # white
+            parent="value_layer"
+        )
+        dpg.draw_text(
+            (710, 147),
+            "N",
+            tag="rpm_text2",
+            size=17,
+            color=(0, 0, 0, 255),
+            parent="value_layer"
+        )
+
+        # Percentage and RPM 2
+        dpg.draw_rectangle(
+            (852, 180),
+            (912, 220),
+            color=(0, 0, 0, 255),
+            fill=(255, 255, 255, 255),  # white
+            parent="value_layer"
+        )
+
+        dpg.draw_rectangle(
+            (920, 180),
+            (1003, 220),
+            color=(0, 0, 0, 255),
+            fill=(255, 255, 255, 255),  # white
+            parent="value_layer"
+        )
+
+        perc2 = angvel2()[0]
+
+        dpg.draw_text(
+            (857, 188),
+            perc2,
+            tag="rpm_text3",
+            size=20,
+            color=(0, 0, 0, 255),
+            parent="value_layer"
+        )
+
+        rpm2 = angvel2()[1]
+
+        dpg.draw_text(
+            (928, 188),
+            rpm2,
+            tag="rpm_text4",
+            size=20,
+            color=(0, 0, 0, 255),
+            parent="value_layer"
+        )
+
+        dpg.draw_rectangle(
+            (852, 140),
+            (1003, 170),
+            color=(0, 0, 0, 255),
+            fill=(255, 255, 255, 255),  # white
+            parent="value_layer"
+        )
+        dpg.draw_text(
+            (920, 147),
+            "E",
+            tag="rpm_text5",
+            size=17,
+            color=(0, 0, 0, 255),
+            parent="value_layer"
+        )
+
+        # Percentage and RPM 3
+        dpg.draw_rectangle(
+            (1062, 180),
+            (1122, 220),
+            color=(0, 0, 0, 255),
+            fill=(255, 255, 255, 255),  # white
+            parent="value_layer"
+        )
+
+        dpg.draw_rectangle(
+            (1130, 180),
+            (1213, 220),
+            color=(0, 0, 0, 255),
+            fill=(255, 255, 255, 255),  # white
+            parent="value_layer"
+        )
+
+        perc3 = angvel3()[0]
+
+        dpg.draw_text(
+            (1067, 188),
+            perc3,
+            tag="rpm_text6",
+            size=20,
+            color=(0, 0, 0, 255),
+            parent="value_layer"
+        )
+
+        rpm3 = angvel3()[1]
+
+        dpg.draw_text(
+            (1138, 188),
+            rpm3,
+            tag="rpm_text7",
+            size=20,
+            color=(0, 0, 0, 255),
+            parent="value_layer"
+        )
+
+        dpg.draw_rectangle(
+            (1062, 140),
+            (1213, 170),
+            color=(0, 0, 0, 255),
+            fill=(255, 255, 255, 255),  # white
+            parent="value_layer"
+        )
+        dpg.draw_text(
+            (1130, 147),
+            "S",
+            tag="rpm_text8",
+            size=17,
+            color=(0, 0, 0, 255),
+            parent="value_layer"
+        )
+
+        # Percentage and RPM 4
+        dpg.draw_rectangle(
+            (1272, 180),
+            (1332, 220),
+            color=(0, 0, 0, 255),
+            fill=(255, 255, 255, 255),  # white
+            parent="value_layer"
+        )
+
+        dpg.draw_rectangle(
+            (1340, 180),
+            (1423, 220),
+            color=(0, 0, 0, 255),
+            fill=(255, 255, 255, 255),  # white
+            parent="value_layer"
+        )
+
+        perc4 = angvel4()[0]
+
+        dpg.draw_text(
+            (1277, 188),
+            perc4,
+            tag="rpm_text9",
+            size=20,
+            color=(0, 0, 0, 255),
+            parent="value_layer"
+        )
+
+        rpm4 = angvel4()[1]
+
+        dpg.draw_text(
+            (1348, 188),
+            rpm4,
+            tag="rpm_text10",
+            size=20,
+            color=(0, 0, 0, 255),
+            parent="value_layer"
+        )
+
+        dpg.draw_rectangle(
+            (1272, 140),
+            (1423, 170),
+            color=(0, 0, 0, 255),
+            fill=(255, 255, 255, 255),  # white
+            parent="value_layer"
+        )
+        dpg.draw_text(
+            (1340, 147),
+            "W",
+            tag="rpm_text11",
+            size=17,
+            color=(0, 0, 0, 255),
+            parent="value_layer"
+        )
+
+    with dpg.viewport_drawlist(front=True, tag="toggle_layer"):
+        pass
+
+
+
+    redraw_toggles()
+
+    apply_font("title_text", fonts["title"])
+    apply_font("stop_button", fonts["large"])
+    apply_font("e_stop_button", fonts["medium"])
+    apply_font("rpm_text", fonts["title"])
+    apply_font("rpm_text1", fonts["title"])
+    apply_font("rpm_text2", fonts["title"])
+    apply_font("rpm_text3", fonts["title"])
+    apply_font("rpm_text4", fonts["title"])
+    apply_font("rpm_text5", fonts["title"])
+    apply_font("rpm_text6", fonts["title"])
+    apply_font("rpm_text7", fonts["title"])
+    apply_font("rpm_text8", fonts["title"])
+    apply_font("rpm_text9", fonts["title"])
+    apply_font("rpm_text10", fonts["title"])
+    apply_font("rpm_text11", fonts["title"])
+
+    theme_main_window()
+    theme_stop_button()
+    theme_toggle_hitbox()
+
+    dpg.set_primary_window("main_window", True)
+
+    dpg.show_viewport()
+    dpg.start_dearpygui()
+    dpg.destroy_context()
+
+# graph
+pwm_data = []
+rpm_data = []
+
+def add_point():
+    new_pwm = 1000 + len(pwm_data) * 50
+    new_rpm = 500 + len(rpm_data) * 200
+    pwm_data.append(new_pwm)
+    rpm_data.append(new_rpm)
+    dpg.set_value("rpm_series", [pwm_data, rpm_data])
+
+
+# Emergence Stop function
+def Emerstop():
+    print("EMERGENCY STOP pressed")
+
+def estop():
+    print("E-STOP pressed")
+
+# Toggle Button initial state
+toggle_state1 = {"up": False}
+toggle_state2 = {"up": False}
+toggle_state3 = {"up": False}
+toggle_state4 = {"up": False}
+
+# Toggle Button Moving Function
+def draw_toggle(TOGGLE_X, TOGGLE_Y, state, hitbox_tag, text_tag):
+    TOGGLE_W = 150
+    TOGGLE_H = 100
+
+    dpg.draw_rectangle(
+        (TOGGLE_X, TOGGLE_Y),
+        (TOGGLE_X + TOGGLE_W, TOGGLE_Y + TOGGLE_H),
+        color=(0, 0, 0, 255),
+        thickness=1,
+        parent="toggle_layer"
+    )
+
+    if state["up"]: #right active
+        x1 = TOGGLE_X + 15 - 2 + 50 
+        x2 = TOGGLE_X + 100 - 10 -2 + 50
+        text_x = 78
+        border_col = (120, 180, 120, 255)
+        fill_col = (48, 81, 242, 255)
+    else: #left inactive
+        x1 = TOGGLE_X + 15 - 2
+        x2 = TOGGLE_X + 100 - 10 -2
+        text_x = 25
+        border_col = (200, 200, 200, 255)
+        fill_col = (200, 200, 200, 255)
+
+    dpg.draw_rectangle(
+        (x1 , TOGGLE_Y + 10),
+        (x2, TOGGLE_Y + 90),
+        fill=fill_col,
+        color=border_col,
+        thickness=1,
+        parent="toggle_layer"
+    )
+
+    dpg.draw_text(
+        (TOGGLE_X + text_x, TOGGLE_Y + 50),
+        "Toggle",
+        color=(255, 255, 255, 255),
+        size=15,
+        parent="toggle_layer",
+        tag=text_tag
+    )
+
+    dpg.set_item_pos(hitbox_tag, (TOGGLE_X, TOGGLE_Y))
+
+# Reset toggle button postion every click
+def redraw_toggles():
+    dpg.delete_item("toggle_layer", children_only=True)
+    draw_toggle(650, 40, toggle_state1, "toggle_hitbox1", "toggletext1")
+    draw_toggle(860, 40, toggle_state2, "toggle_hitbox2", "toggletext2")
+    draw_toggle(1070, 40, toggle_state3, "toggle_hitbox3", "toggletext3")
+    draw_toggle(1280, 40, toggle_state4, "toggle_hitbox4", "toggletext4")
+
+
+# Toggle Button 1 Function
+def toggle1():
+    toggle_state1["up"] = not toggle_state1["up"]
+    redraw_toggles()
+    print("Toggle 1 Pressed")
+
+# Toggle Button 2 Function
+def toggle2():
+    toggle_state2["up"] = not toggle_state2["up"]
+    redraw_toggles()
+    print("Toggle 2 Pressed")
+
+# Toggle Button 3 Function
+def toggle3():
+    toggle_state3["up"] = not toggle_state3["up"]
+    redraw_toggles()
+    print("Toggle 3 Pressed")
+
+# Toggle Button 4 Function
+def toggle4():
+    toggle_state4["up"] = not toggle_state4["up"]
+    redraw_toggles()
+    print("Toggle 4 Pressed")
+
+# Angular velocity box
+def angvel1():
+    rpm = f"{37} RPM"
+    perc = f"{37} %"
+    return perc, rpm
+
+def angvel2():
+    rpm = f"{27} RPM"
+    perc = f"{100} %"
+    return perc, rpm
+
+def angvel3():
+    rpm = f"{27} RPM"
+    perc = f"{100} %"
+    return perc, rpm
+
+def angvel4():
+    rpm = f"{17} RPM"
+    perc = f"{50} %"
+    return perc, rpm
+
+
+if __name__ == "__main__":
+    main()
